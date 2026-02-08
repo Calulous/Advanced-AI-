@@ -27,18 +27,6 @@ MENU for ' METRO LINE NAVIGATION '
 
 '''
 
-'''
-SCL METRO NAVIGATOR — BFS DEMONSTRATION
-----------------------------------------
-1. Display Metro Map
-2. Perform BFS Traversal (Explore all stations)
-3. Find Shortest Route (Fewest Stops)
-4. Exit
-----------------------------------------
-Enter your choice:
-
-'''
-
 print("---------------------------------------------------")
 print("    SCL METRO NAVIGATOR — BFS DEMONSTRATION")
 print("---------------------------------------------------")
@@ -53,6 +41,20 @@ choice = int(input("Enter your choice: "))
 print("Your entered choice is: ", choice)
 
 
+def chosen_option():
+    if choice == 1:
+        print("Below is the Metro Map")
+    elif choice == 2:
+        print("BFS Traversal - Exploring All Stations")
+    elif choice == 3: 
+        print("Finding Shortest Route - Fewest Stops")
+    elif choice == 4: 
+        print("Exit: Leaving Metro Navigator bye bye!")
+    else:
+        print("Invalid choice. Please select between 1 and 4.")
+
+
+chosen_option()
 
 
 
