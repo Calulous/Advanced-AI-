@@ -39,9 +39,11 @@ def show_menu(): # wrapping the menu display in a function so that they use the 
 
 
 
-def chosen_option(choice):
+def chosen_option(choice, graph):
     if choice == 1:
         print("Below is the Metro Map")
+        display_metro_map(graph)                                    # connecting the me
+
     elif choice == 2:
         print("BFS Traversal - Exploring All Stations")
     elif choice == 3: 
@@ -52,6 +54,20 @@ def chosen_option(choice):
         print("Invalid choice. Please select between 1 and 4.")
 
 
+# GRAPH - Metro Line 
+
+graph = {
+    "A": ["B", "C"],
+    "B": ["A", "D"],
+    "C": ["A", "D"],
+    "D": ["B", "C"]
+}
+
+
+metro_line = input("Enter Metro Line to simulate (Red/Green): ")
+print(f"Simulating {metro_line} Line")
+
+
 # -------- MAIN METRO MENU LOOP --------      
 running = True
 
@@ -59,13 +75,30 @@ while running:                              # using a while loop so that the use
     show_menu()
     try:                                    # try and except for error-handling
         choice = int(input("Enter your choice: "))          # asking user to enter choice
-        running = chosen_option(choice)                     # chosen_option function runs with the value of choice var............. the return value gets stored in running var
+        running = chosen_option(choice, graph)                     # chosen_option function runs with the value of choice var............. the return value gets stored in running var
                                                             # we do this so 'choice' is not a global var
                                                             # running has a true/ false value - false when user chooses 'Exit'
                                                             # return values help separate decision logic from control flow 
     except ValueError:                                      
         print("Please enter a valid number.")
 
+
+
+'''
+------------------------------------------------------
+LOGIC for MENU Options: 
+MENU for ' METRO LINE NAVIGATION '
+------------------------------------------------------
+
+'''
+
+def display_metro_map(graph):                               # BFS is graph traversal
+    print("Metro Map (Adjacency list): ")                   # shows the node - node connection 
+    
+
+    # For each station in the metro network, print the station name followed by all stations directly connected to it.
+    for station in graph:                                               # for metro station in the metro line 
+        print(f"{station} -> {', '.join(graph[station])}")              # if station = A, graph[station]: ['B', 'C'] + join = 'B' , 'C'
 
 
 
