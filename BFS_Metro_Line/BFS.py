@@ -27,21 +27,19 @@ MENU for ' METRO LINE NAVIGATION '
 
 '''
 
-print("---------------------------------------------------")
-print("    SCL METRO NAVIGATOR — BFS DEMONSTRATION")
-print("---------------------------------------------------")
-print("1. Display Metro Map")
-print("2. Perform BFS Traversal (Explore all stations)")
-print("3. Find Shortest Route (Fewest Stops)")
-print("4. Exit")
-print("---------------------------------------------------")
+def show_menu(): # wrapping the menu display in a function so that they use the menu until they exit 
+    print("---------------------------------------------------")
+    print("    SCL METRO NAVIGATOR — BFS DEMONSTRATION")
+    print("---------------------------------------------------")
+    print("1. Display Metro Map")
+    print("2. Perform BFS Traversal (Explore all stations)")
+    print("3. Find Shortest Route (Fewest Stops)")
+    print("4. Exit")
+    print("---------------------------------------------------")
 
 
-choice = int(input("Enter your choice: "))
-print("Your entered choice is: ", choice)
 
-
-def chosen_option():
+def chosen_option(choice):
     if choice == 1:
         print("Below is the Metro Map")
     elif choice == 2:
@@ -54,7 +52,19 @@ def chosen_option():
         print("Invalid choice. Please select between 1 and 4.")
 
 
-chosen_option()
+# -------- MAIN METRO MENU LOOP --------      
+running = True
+
+while running:                              # using a while loop so that the user can keep using the menu, instead of using menu options only once
+    show_menu()
+    try:                                    # try and except for error-handling
+        choice = int(input("Enter your choice: "))          # asking user to enter choice
+        running = chosen_option(choice)                     # chosen_option function runs with the value of choice var............. the return value gets stored in running var
+                                                            # we do this so 'choice' is not a global var
+                                                            # running has a true/ false value - false when user chooses 'Exit'
+                                                            # return values help separate decision logic from control flow 
+    except ValueError:                                      
+        print("Please enter a valid number.")
 
 
 
