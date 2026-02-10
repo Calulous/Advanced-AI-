@@ -37,25 +37,26 @@ def display_metro_map(graph):                               # BFS is graph trave
         print(f"{station} -> {', '.join(graph[station])}")              # if station = A, graph[station]: ['B', 'C'] + join = 'B' , 'C'
 
 
+'''********************************************************************************************************************'''
 
 # OPTION 2 LOGIC 
 from collections import deque   # deque gives us an efficient queue (FIFO)
 
 def bfs_traversal(graph, start):
     """
-    This function performs Breadth-First Search (BFS)
-    starting from the given station.
-    It explores the metro network level-by-level.
+    BFS starts from a selected station and explores all nearby stations first before moving deeper.
+    A visited set prevents infinite loops and repeated visits.
+    Explores the metro line level by level 
     """
 
     visited = set()      # Keeps track of stations already visited
-    queue = deque()      # Queue for BFS (First In, First Out)
+    queue = deque()      # Queue for BFS (FIFO)
 
     # Step 1: Start from the chosen station
     visited.add(start)   # Mark starting station as visited
     queue.append(start)  # Add starting station to the queue
 
-    order = []           # Stores the order in which stations are visited
+    order = []           # Stores the order in which stations are visited, it starts of with an empty list and then populates 
 
     # Step 2: Continue until there are no stations left to explore
     while queue:
@@ -76,6 +77,52 @@ def bfs_traversal(graph, start):
     return order
 
 
+'''********************************************************************************************************************'''
+
+# OPTIOM 3 LOGIC 
+from collections import deque
+
+def bfs_shortest_path(graph, start, target):
+    """
+    Finds the shortest path (fewest stops) from start to target using BFS.
+    Returns a list of stations representing the path, or None if no path exists.
+    """
+
+    # Edge case: start is already the target
+    if start == target:
+        return [start]
+
+    visited = set()
+    queue = deque()
+
+    # parent dictionary lets us rebuild the path later
+    parent = {start: None}
+
+    visited.add(start)
+    queue.append(start)
+
+    while queue:
+        current = queue.popleft()
+
+        # Explore neighbors of current station
+        for neighbor in graph.get(current, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                parent[neighbor] = current   # record how we reached neighbor
+                queue.append(neighbor)
+
+                # Stop early as soon as we find the target (BFS guarantee)
+                if neighbor == target:
+                    # Reconstruct path by walking backwards using parent pointers
+                    path = []
+                    node = target
+                    while node is not None:
+                        path.append(node)
+                        node = parent[node]
+                    path.reverse()
+                    return path
+
+    return None  # Target not reachable
 
 
 
@@ -101,16 +148,54 @@ def show_menu(): # wrapping the menu display in a function so that they use the 
 
 def chosen_option(choice, graph):
     if choice == 1:
-        print("Below is the Metro Map")
+        print("Below is the Metro Map")                             # user selects red/ green and then metro map displays
         display_metro_map(graph)                                    # connecting the option 1 logic 
         return True                                                 # this is so that the menu keeps showing 
 
     elif choice == 2:
         print("BFS Traversal - Exploring All Stations")
+
+        # Ask user for starting station
+        start = input("Enter starting station: ").strip()
+
+        # Validate station
+        if start not in graph:
+            print("Invalid station name. Please choose a station from the metro map.")
+            return True
+
+        # Run BFS
+        traversal = bfs_traversal(graph, start)
+
+        # Display result
+        print("\nBFS Traversal Order:")
+        print(" -> ".join(traversal))
+
         return True
+
     elif choice == 3: 
-        print("Finding Shortest Route - Fewest Stops")
+
+        start = input("Enter start station: ").strip()
+        if start not in graph:
+            print("Invalid start station. Please choose from the metro map.")
+            return True
+
+        target = input("Enter destination station: ").strip()
+        if target not in graph:
+            print("Invalid destination station. Please choose from the metro map.")
+            return True
+
+        path = bfs_shortest_path(graph, start, target)
+
+        if path is None:
+            print("\nNo route exists between those stations.")
+        else:
+            print("\nShortest Route (Fewest Stops):")
+            print(" -> ".join(path))
+            print(f"Stops: {len(path)-1}")   # number of edges = stops between stations
+
         return True
+
+
     elif choice == 4: 
         print("Exit: Leaving Metro Navigator bye bye!")
         return False 
