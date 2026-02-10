@@ -21,6 +21,66 @@ Steps to code a BFS algorithm
 
 '''
 ------------------------------------------------------
+LOGIC for MENU Options: 
+MENU for ' METRO LINE NAVIGATION '
+moved this up as the function must always be defined before its called in Python
+------------------------------------------------------
+
+'''
+
+# OPTION 1 LOGIC 
+def display_metro_map(graph):                               # BFS is graph traversal
+    print("Metro Map (Adjacency list): ")                   # shows the node - node connection 
+    
+    # For each station in the metro network, print the station name followed by all stations directly connected to it.
+    for station in graph:                                               # for metro station in the metro line 
+        print(f"{station} -> {', '.join(graph[station])}")              # if station = A, graph[station]: ['B', 'C'] + join = 'B' , 'C'
+
+
+
+# OPTION 2 LOGIC 
+from collections import deque   # deque gives us an efficient queue (FIFO)
+
+def bfs_traversal(graph, start):
+    """
+    This function performs Breadth-First Search (BFS)
+    starting from the given station.
+    It explores the metro network level-by-level.
+    """
+
+    visited = set()      # Keeps track of stations already visited
+    queue = deque()      # Queue for BFS (First In, First Out)
+
+    # Step 1: Start from the chosen station
+    visited.add(start)   # Mark starting station as visited
+    queue.append(start)  # Add starting station to the queue
+
+    order = []           # Stores the order in which stations are visited
+
+    # Step 2: Continue until there are no stations left to explore
+    while queue:
+
+        # Step 3: Remove the first station from the queue
+        current_station = queue.popleft()
+        order.append(current_station)   # "Visit" the station
+
+        # Step 4: Explore all directly connected stations
+        for neighbor in graph.get(current_station, []):
+
+            # Step 5: Visit neighbor only if it hasn't been visited before
+            if neighbor not in visited:
+                visited.add(neighbor)      # Mark as visited
+                queue.append(neighbor)     # Add to queue for future exploration
+
+    # Step 6: Return the BFS traversal order
+    return order
+
+
+
+
+
+'''
+------------------------------------------------------
 PROGRAM START: 
 MENU for ' METRO LINE NAVIGATION '
 ------------------------------------------------------
@@ -42,30 +102,70 @@ def show_menu(): # wrapping the menu display in a function so that they use the 
 def chosen_option(choice, graph):
     if choice == 1:
         print("Below is the Metro Map")
-        display_metro_map(graph)                                    # connecting the me
+        display_metro_map(graph)                                    # connecting the option 1 logic 
+        return True                                                 # this is so that the menu keeps showing 
 
     elif choice == 2:
         print("BFS Traversal - Exploring All Stations")
+        return True
     elif choice == 3: 
         print("Finding Shortest Route - Fewest Stops")
+        return True
     elif choice == 4: 
         print("Exit: Leaving Metro Navigator bye bye!")
+        return False 
     else:
         print("Invalid choice. Please select between 1 and 4.")
+        return True 
 
 
-# GRAPH - Metro Line 
 
-graph = {
-    "A": ["B", "C"],
-    "B": ["A", "D"],
-    "C": ["A", "D"],
-    "D": ["B", "C"]
+
+
+'''
+--------------------------------------------------------------
+GRAPH 
+RED LINE & GREEN LINE METRO MAP 
+--------------------------------------------------------------
+'''
+
+red_graph = {
+    "Etisalat by e&": ["Stadium"],
+    "Stadium": ["Etisalat by e&", "Al Nahda"],
+    "Al Nahda": ["Stadium", "Airport Terminal 1"],
+    "Airport Terminal 1": ["Al Nahda", "Union"],
+    "Union": ["Airport Terminal 1", "BurJuman"],
+    "BurJuman": ["Union", "Business Bay"],
+    "Business Bay": ["BurJuman"]
+}
+
+green_graph = {
+    "Etisalat": ["Al Qusais"],
+    "Al Qusais": ["Etisalat", "Stadium (Green)"],
+    "Stadium (Green)": ["Al Qusais", "Union"],
+    "Union": ["Stadium (Green)", "BurJuman"],
+    "BurJuman": ["Union", "Sharaf DG"],
+    "Sharaf DG": ["BurJuman"]
 }
 
 
-metro_line = input("Enter Metro Line to simulate (Red/Green): ")
-print(f"Simulating {metro_line} Line")
+
+
+# WHERE THE USER INPUT STARTS  
+
+metro_line = input("Enter Metro Line to simulate (Red/Green): ").strip().lower()
+print(f"Simulating {metro_line.capitalize()} Line")
+
+if metro_line == "red":                         # connecting the logic to the display metro map function 
+    graph = red_graph                           # if the user chooses red line then it displays red graph and vv 
+elif metro_line == "green":
+    graph = green_graph
+else:
+    print("Invalid line. Defaulting to Red.")   # i have just made the default go to red for error handling 
+    graph = red_graph
+
+
+
 
 
 # -------- MAIN METRO MENU LOOP --------      
@@ -83,22 +183,6 @@ while running:                              # using a while loop so that the use
         print("Please enter a valid number.")
 
 
-
-'''
-------------------------------------------------------
-LOGIC for MENU Options: 
-MENU for ' METRO LINE NAVIGATION '
-------------------------------------------------------
-
-'''
-
-def display_metro_map(graph):                               # BFS is graph traversal
-    print("Metro Map (Adjacency list): ")                   # shows the node - node connection 
-    
-
-    # For each station in the metro network, print the station name followed by all stations directly connected to it.
-    for station in graph:                                               # for metro station in the metro line 
-        print(f"{station} -> {', '.join(graph[station])}")              # if station = A, graph[station]: ['B', 'C'] + join = 'B' , 'C'
 
 
 
