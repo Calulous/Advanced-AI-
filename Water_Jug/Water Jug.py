@@ -5,8 +5,12 @@
 from collections import deque
 from math import gcd # Greatest Common Divisor 
 
-
-def is_solvable(capA, capB, target):                        # the user will provide sizes of jugs and target value 
+'''
+LOGIC:
+Are the values solvable?
+Can the target value be reached? 
+'''
+def is_solvable(jugA, jugB, target):                        # solvable = True 
     # A solution exists only if:                            # this function has the logic if the sizes r solvable 
     # 1) target is not bigger than the largest jug
     # 2) gcd(capA, capB) divides target
@@ -14,26 +18,29 @@ def is_solvable(capA, capB, target):                        # the user will prov
         return False
     if target == 0:
         return True
-    if target > max(capA, capB):
+    if target > max(jugA, jugB):                            # target <= largest jug size 
         return False
-    return target % gcd(capA, capB) == 0
+    return target % gcd(jugA, jugB) == 0                    # remainder = 0, gcd(4.3) = 1 and gcd(6,10)=2, greatest common divider btw both jug sizes
 
 
-def get_next_states(state, capA, capB):
-    """
+
+"""
     From a given state (a, b), generate all reachable next states.
     Each move includes an action description for showing the path.
-    """
+"""
+
+def get_next_states(state, jugA, jugB):
+    
     a, b = state
     moves = []
 
     # 1) Fill A
-    if a < capA:
-        moves.append(((capA, b), f"Fill A to {capA}"))
+    if a < jugA:
+        moves.append(((jugA, b), f"Fill A to {jugA}"))
 
     # 2) Fill B
-    if b < capB:
-        moves.append(((a, capB), f"Fill B to {capB}"))
+    if b < jugB:
+        moves.append(((a, jugB), f"Fill B to {jugB}"))
 
     # 3) Empty A
     if a > 0:
@@ -44,19 +51,19 @@ def get_next_states(state, capA, capB):
         moves.append(((a, 0), "Empty B"))
 
     # 5) Pour A -> B
-    if a > 0 and b < capB:
-        pour = min(a, capB - b)
+    if a > 0 and b < jugB:
+        pour = min(a, jugB - b)
         moves.append(((a - pour, b + pour), f"Pour {pour} from A -> B"))
 
     # 6) Pour B -> A
-    if b > 0 and a < capA:
-        pour = min(b, capA - a)
+    if b > 0 and a < jugA:
+        pour = min(b, jugA - a)
         moves.append(((a + pour, b - pour), f"Pour {pour} from B -> A"))
 
     return moves
 
 
-def solve_water_jug_bfs(capA, capB, target):
+def solve_water_jug_bfs(jugA, jugB, target):
     """
     BFS over state space.
     Returns a reconstructed path as a list of tuples:
@@ -65,7 +72,7 @@ def solve_water_jug_bfs(capA, capB, target):
     """
     start = (0, 0)
 
-    if not is_solvable(capA, capB, target):
+    if not is_solvable(jugA, jugB, target):
         return None
 
     queue = deque([start])
@@ -91,7 +98,7 @@ def solve_water_jug_bfs(capA, capB, target):
             return path
 
         # Explore neighbors (next possible states)
-        for next_state, action in get_next_states(current, capA, capB):
+        for next_state, action in get_next_states(current, jugA, jugB):
             if next_state not in visited:
                 visited.add(next_state)
                 parent[next_state] = (current, action)
@@ -100,25 +107,33 @@ def solve_water_jug_bfs(capA, capB, target):
     return None
 
 
-
+#------------------------------------------------------------------------------------------------------------------------------#
 '''
 MAIN FUNCTION 
 USER INPUT
 THEN CALLS THE LOGIC FUNCTIONS 
 
 '''
+
 def main():
     print("\n WATER JUG PROBLEM SOLVER (BFS State-Space Search)")
 
-    capA = int(input("Enter capacity of Jug A: "))
-    capB = int(input("Enter capacity of Jug B: "))
+    jugA = int(input("Enter capacity of Jug A: "))
+    jugB = int(input("Enter capacity of Jug B: "))
     target = int(input("Enter target amount: "))
 
-    solution = solve_water_jug_bfs(capA, capB, target)
+    print("\n--- Problem Setup ---")
+    print(f"Jug A Capacity : {jugA}")
+    print(f"Jug B Capacity : {jugB}")
+    print(f"Target Amount  : {target}")
+    print("---------------------")
+
+
+    solution = solve_water_jug_bfs(jugA, jugB, target)
 
     if solution is None:
         print("\n No solution exists for these inputs.")
-        print("Rule: target <= max(capA, capB) and gcd(capA, capB) must divide target.")
+        print("Rule: target <= max(jugA, jugB) and gcd(jugA, jugB) must divide target.")
         return
 
     print("\n Solution found (fewest moves):\n")
