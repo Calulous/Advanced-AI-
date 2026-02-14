@@ -1,6 +1,22 @@
-# JAR SIZES MUST BE TAKEN FROM USER 
-# SHOW THE PATH 
-# even jar c shud be user input ... basically the user shud enter the size of 2 jugs and how much they want in the jug 
+"""
+Why BFS is a Good Choice Here:
+
+In the Water Jug Problem, we are trying to find the shortest sequence 
+of actions that leads to the target amount. Since every action 
+(fill, empty, pour) counts as one step, this problem can be modeled 
+as an unweighted graph.
+
+Breadth-First Search (BFS) is ideal in this case because it explores 
+all possible states step-by-step, level by level. This ensures that 
+the first time we find the solution, it uses the fewest number of moves.
+
+That is why BFS guarantees the optimal solution for this problem.
+
+
+Backtracking explores one path deeply before trying alternatives.
+Greedy Search makes decisions based only on immediate improvement.
+"""
+
 
 from collections import deque
 from math import gcd # Greatest Common Divisor 
@@ -25,86 +41,210 @@ def is_solvable(jugA, jugB, target):                        # solvable = True
 
 
 """
-    From a given state (a, b), generate all reachable next states.
-    Each move includes an action description for showing the path.
+From a given state (a, b), generate all reachable next states.
+Each move includes:
+    1) The new state after performing the action
+    2) A text description of the action (for path reconstruction)
 """
 
 def get_next_states(state, jugA, jugB):
     
+    # ---------------------------------------------------------
+    # STEP 1: Unpack the current state
+    # ---------------------------------------------------------
+    # state is a tuple (a, b)
+    # a = current amount of water in Jug A
+    # b = current amount of water in Jug B
     a, b = state
+
+    # This list will store all possible next moves from (a, b)
+    # Each element will look like:
+    # ((new_a, new_b), "Action description")
     moves = []
 
-    # 1) Fill A
+    # ---------------------------------------------------------
+    # STEP 2: Try ALL possible legal operations
+    # ---------------------------------------------------------
+    # These 6 operations define the transition model of the problem.
+
+
+    # ---------------------------------------------------------
+    # 1) Fill Jug A completely
+    # ---------------------------------------------------------
+    # Only possible if Jug A is not already full
     if a < jugA:
+        # New state becomes (jugA, b)
         moves.append(((jugA, b), f"Fill A to {jugA}"))
 
-    # 2) Fill B
+
+    # ---------------------------------------------------------
+    # 2) Fill Jug B completely
+    # ---------------------------------------------------------
+    # Only possible if Jug B is not already full
     if b < jugB:
+        # New state becomes (a, jugB)
         moves.append(((a, jugB), f"Fill B to {jugB}"))
 
-    # 3) Empty A
+
+    # ---------------------------------------------------------
+    # 3) Empty Jug A completely
+    # ---------------------------------------------------------
+    # Only possible if Jug A has water
     if a > 0:
+        # New state becomes (0, b)
         moves.append(((0, b), "Empty A"))
 
-    # 4) Empty B
+
+    # ---------------------------------------------------------
+    # 4) Empty Jug B completely
+    # ---------------------------------------------------------
+    # Only possible if Jug B has water
     if b > 0:
+        # New state becomes (a, 0)
         moves.append(((a, 0), "Empty B"))
 
-    # 5) Pour A -> B
+
+    # ---------------------------------------------------------
+    # 5) Pour water from Jug A into Jug B
+    # ---------------------------------------------------------
+    # Conditions:
+    # - Jug A must have water
+    # - Jug B must not be full
     if a > 0 and b < jugB:
+
+        # Calculate how much we can pour WITHOUT overflowing
+        # We pour the minimum of:
+        # - how much water is in A
+        # - how much space is left in B
         pour = min(a, jugB - b)
+
+        # New state after pouring
+        # A loses 'pour'
+        # B gains 'pour'
         moves.append(((a - pour, b + pour), f"Pour {pour} from A -> B"))
 
-    # 6) Pour B -> A
+
+    # ---------------------------------------------------------
+    # 6) Pour water from Jug B into Jug A
+    # ---------------------------------------------------------
+    # Conditions:
+    # - Jug B must have water
+    # - Jug A must not be full
     if b > 0 and a < jugA:
+
+        # Again, prevent overflow
         pour = min(b, jugA - a)
+
+        # New state after pouring
         moves.append(((a + pour, b - pour), f"Pour {pour} from B -> A"))
 
+
+    # ---------------------------------------------------------
+    # STEP 3: Return all valid next states
+    # ---------------------------------------------------------
+    # BFS will use this list to explore the state space
     return moves
+
 
 
 def solve_water_jug_bfs(jugA, jugB, target):
     """
-    BFS over state space.
-    Returns a reconstructed path as a list of tuples:
-    [(state, action), ...]
-    starting with ((0,0), "Start")
+    Uses Breadth-First Search (BFS) to solve the Water Jug Problem.
+    
+    Returns:
+        A list of steps representing the shortest solution path.
+        Each step is a tuple:
+            (state, action_taken)
+        Starting from ((0, 0), "Start")
     """
+
+    # ---------------------------------------------------------
+    # STEP 1: Define the starting state
+    # ---------------------------------------------------------
+    # Initially, both jugs are empty.
     start = (0, 0)
 
+    # ---------------------------------------------------------
+    # STEP 2: Check if problem is solvable
+    # ---------------------------------------------------------
+    # If mathematical conditions fail, no need to run BFS.
     if not is_solvable(jugA, jugB, target):
         return None
 
+
+    # ---------------------------------------------------------
+    # STEP 3: Initialize BFS structures
+    # ---------------------------------------------------------
+
+    # Queue for BFS (FIFO structure)
     queue = deque([start])
+
+    # Visited set prevents infinite loops
     visited = set([start])
 
-    # parent[state] = (previous_state, action_used)
+    # Parent dictionary helps reconstruct path
+    # parent[state] = (previous_state, action_used_to_get_here)
     parent = {start: (None, "Start")}
 
+
+    # ---------------------------------------------------------
+    # STEP 4: BFS Loop
+    # ---------------------------------------------------------
+    # Continue until queue becomes empty.
     while queue:
+
+        # Remove first element from queue (FIFO behavior)
         current = queue.popleft()
+
+        # Extract amounts in each jug
         a, b = current
 
-        # Goal test
+
+        # -----------------------------------------------------
+        # STEP 5: Goal Test
+        # -----------------------------------------------------
+        # If either jug has the target amount, we stop.
         if a == target or b == target:
-            # Reconstruct the path
+
+            # Reconstruct the solution path
             path = []
             node = current
+
+            # Backtrack from goal to start
             while node is not None:
-                prev, action = parent[node]
+                prev_state, action = parent[node]
                 path.append((node, action))
-                node = prev
+                node = prev_state
+
+            # Reverse path so it goes from start → goal
             path.reverse()
+
             return path
 
-        # Explore neighbors (next possible states)
+
+        # -----------------------------------------------------
+        # STEP 6: Generate All Possible Next States
+        # -----------------------------------------------------
+        # Use the transition function
         for next_state, action in get_next_states(current, jugA, jugB):
+
+            # Only explore if not visited before
             if next_state not in visited:
+
                 visited.add(next_state)
+
+                # Record how we reached this state
                 parent[next_state] = (current, action)
+
+                # Add new state to BFS queue
                 queue.append(next_state)
 
+
+    # ---------------------------------------------------------
+    # STEP 7: If No Solution Found
+    # ---------------------------------------------------------
     return None
+
 
 
 #------------------------------------------------------------------------------------------------------------------------------#
