@@ -2,6 +2,11 @@
 # This chatbot uses a transformer-based causal language model (DistilGPT-2).
 # It predicts the next word (token) based on previous context using self-attention.
 
+# Hybrid Chatbot Design:
+# - Rule-based responses for predictable intents
+# - Transformer-based generation for open-ended prompts
+# This ensures stability + flexibility.
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
@@ -65,10 +70,23 @@ while True:
 
     if user_lower in ["hi", "hello", "hey"]:
         print("Bot: Hello! 😊")
+        print("")
         continue
 
     if user_lower in ["how are you", "how r u", "how are you doing"]:
         print("Bot: I'm good, thanks! How about you?")
+        print("")
+        continue
+
+    if user_lower in ["i am good", "i am okay","i am fine"]:
+        print("Bot: Lovely!, What can I help with?")
+        print("")
+        continue
+    
+
+    if user_lower in ["what can you help with", "what can you do","how can you help","what do you do"]:
+        print("Bot: I am a text based bot. I can chat with you, answer simple questions, and generate text replies based on your prompts!")
+        print("")
         continue
 
 
